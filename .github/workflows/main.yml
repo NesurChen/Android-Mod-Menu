@@ -18,5 +18,6 @@ jobs:
       with:
         java-version: 1.8
     - name: Build with Gradle
+    - run : echo "this is a test for packaging apps"
     - run: chmod +x ./gradlew
     - run: ./gradlew build
