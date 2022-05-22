@@ -24,4 +24,4 @@ jobs:
     - uses: actions/upload-artifact@v3
       with:
         name: dump.apk
-        path: out/magisk_module_release/
+        path: ${{ github.workspace }}
