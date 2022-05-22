@@ -1,13 +1,15 @@
 #ifndef UTILS
 #define UTILS
-
+using namespace std;
 #include <jni.h>
 #include <unistd.h>
 #include <cstdio>
 #include <cstring>
 #include <string>
 #include <cstdlib>
+#include <sstream>
 #include "Logger.h"
+
 
 typedef unsigned long DWORD;
 static uintptr_t libBase;
@@ -96,5 +98,99 @@ namespace ToastLength {
     inline const int LENGTH_LONG = 1;
     inline const int LENGTH_SHORT = 0;
 }
+std::string WString2String(const std::wstring& ws)
+{
+    std::string strLocale = setlocale(LC_ALL, "");
+    const wchar_t* wchSrc = ws.c_str();
+    size_t nDestSize = wcstombs(NULL, wchSrc, 0) + 1;
+    char *chDest = new char[nDestSize];
+    memset(chDest, 0, nDestSize);
+    wcstombs(chDest, wchSrc, nDestSize);
+    std::string strResult = chDest;
+    delete[]chDest;
+    setlocale(LC_ALL, strLocale.c_str());
+    return strResult;
+}
+std::wstring String2WString(const std::string& s)
+{
+    std::string strLocale = setlocale(LC_ALL, "");
+    const char* chSrc = s.c_str();
+    size_t nDestSize = mbstowcs(NULL, chSrc, 0) + 1;
+    wchar_t* wchDest = new wchar_t[nDestSize];
+    wmemset(wchDest, 0, nDestSize);
+    mbstowcs(wchDest, chSrc, nDestSize);
+    std::wstring wstrResult = wchDest;
+    delete[]wchDest;
+    setlocale(LC_ALL, strLocale.c_str());
+    return wstrResult;
+}
+wstring String2Hex(wstring str, wstring separator = L"")
+{
+    const wstring hex = L"0123456789ABCDEF";
+    wstringstream ss;
+    for (wstring::size_type i = 0; i < str.size(); ++i)
+    {
+
+        ss << hex[(unsigned char)str[i] >> 4] <<
+           hex[(unsigned char)str[i] & 0xf] <<
+           hex[str[i] >> 12] <<
+           hex[(str[i] & 0xf00)>>8] <<
+           separator;
+    }
+    return ss.str();
+}
+wstring Hex2String(wstring str)
+{
+    wstring hex = str;
+    long len = hex.length();
+    wstring newString;
+    for (long i = 0; i < len; i += 4)
+    {
+
+        wstring byte = hex.substr(i, 4);
+        int n= wcstol(byte.c_str(), NULL, 16);
+        char* p = (char*)&n;
+        *(p + 1) = *p + *(p + 1);
+        *p = *(p + 1)- *p;
+        *(p + 1) = *(p + 1) - *p;
+        wchar_t chr = (wchar_t)(int)n;
+        newString.push_back(chr);
+    }
+    return newString;
+}
+string Number2Hex(uint8_t n){
+    uint8_t  x;
+    string s;
+    string t = "0123456789ABCDEF";
+    while(n != 0){
+        x = n % 16;
+        // 将 n % 16 转换为字符逆序存入 s
+        s = t[x] + s;
+        n = n / 16;
+    }
+
+    if(s == ""){
+        return "";
+    }else{
+        return  s;
+    }
+}
+string readUtf16String(int* nameStr){
+    string result;
+    uint8_t name;
+    if(nameStr == 0){
+        return "";
+    }
+    for(int i = 0; ; i++){
+        name = *(int*)((uint64_t)nameStr + 0xC + i);
+        if(name == 0){
+            break;
+        }
+        result += Number2Hex(name);
+    }
+    wstring ret = Hex2String(String2WString(result));
+    return WString2String(ret);
+}
+
 
 #endif

@@ -38,6 +38,7 @@ namespace ay
 
     // Generate a psuedo-random key that spans all 8 bytes
     constexpr key_type generate_key(key_type seed)
+
     {
         // Use the MurmurHash3 64-bit finalizer to hash our seed
         key_type key = seed;
@@ -178,7 +179,7 @@ namespace ay
     // This function exists purely to extract the number of elements 'N' in the
     // array 'data'
     template <size_type N, key_type KEY = AY_OBFUSCATE_DEFAULT_KEY>
-    constexpr auto make_obfuscator(const char(&data)[N])
+    constexpr auto make_obfuscator(const char(*data))
     {
         return obfuscator<N, KEY>(data);
     }

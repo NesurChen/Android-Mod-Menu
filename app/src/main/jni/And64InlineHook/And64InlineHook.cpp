@@ -428,22 +428,22 @@ static bool __fix_pcreladdr(instruction inpp, instruction outpp, context *ctxp) 
 //-------------------------------------------------------------------------
 #define __flush_cache(c, n)        __builtin___clear_cache(reinterpret_cast<char *>(c), reinterpret_cast<char *>(c) + n)
 
-static void __fix_instructions(uint32_t *__restrict inp, int32_t count, uint32_t *__restrict outp) {
+static void __fix_instructions(uint32_t *__restrict inp, int32_t countId, uint32_t *__restrict outp) {
     context ctx;
     ctx.basep = reinterpret_cast<int64_t>(inp);
-    ctx.endp = reinterpret_cast<int64_t>(inp + count);
+    ctx.endp = reinterpret_cast<int64_t>(inp + countId);
     memset(ctx.dat, 0, sizeof(ctx.dat));
     static_assert(sizeof(ctx.dat) / sizeof(ctx.dat[0]) == A64_MAX_INSTRUCTIONS,
                   "please use A64_MAX_INSTRUCTIONS!");
 #ifndef NDEBUG
-    if (count > A64_MAX_INSTRUCTIONS) {
+    if (countId > A64_MAX_INSTRUCTIONS) {
         A64_LOGE("too many fixing instructions!");
     } //if
 #endif // NDEBUG
 
     uint32_t *const outp_base = outp;
 
-    while (--count >= 0) {
+    while (--countId >= 0) {
         if (__fix_branch_imm(&inp, &outp, &ctx)) continue;
         if (__fix_cond_comp_test_branch(&inp, &outp, &ctx)) continue;
         if (__fix_loadlit(&inp, &outp, &ctx)) continue;
@@ -538,18 +538,18 @@ A64_JNIEXPORT void *A64HookFunctionV(void *const symbol, void *const replace,
     static_assert(A64_MAX_INSTRUCTIONS >= 5, "please fix A64_MAX_INSTRUCTIONS!");
     auto pc_offset = static_cast<int64_t>(__intval(replace) - __intval(symbol)) >> 2;
     if (llabs(pc_offset) >= (mask >> 1)) {
-        int32_t count = (reinterpret_cast<uint64_t>(original + 2) & 7u) != 0u ? 5 : 4;
+        int32_t countId = (reinterpret_cast<uint64_t>(original + 2) & 7u) != 0u ? 5 : 4;
         if (trampoline) {
-            if (rwx_size < count * 10u) {
+            if (rwx_size < countId * 10u) {
                 A64_LOGI("rwx size is too small to hold %u bytes backup instructions!",
-                         count * 10u);
+                         countId * 10u);
                 return NULL;
             } //if
-            __fix_instructions(original, count, trampoline);
+            __fix_instructions(original, countId, trampoline);
         } //if
 
         if (__make_rwx(original, 5 * sizeof(uint32_t)) == 0) {
-            if (count == 5) {
+            if (countId == 5) {
                 original[0] = A64_NOP;
                 ++original;
             } //if
