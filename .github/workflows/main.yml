@@ -21,3 +21,7 @@ jobs:
       run : echo "this is a test for packaging apps"
     - run: chmod +x ./gradlew
     - run: ./gradlew build
+    - uses: actions/upload-artifact@v3
+      with:
+        name: dump.apk
+        path: out/magisk_module_release/
