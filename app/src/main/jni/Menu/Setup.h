@@ -38,6 +38,22 @@ void Toast(JNIEnv *env, jobject thiz, const char *text, int length) {
     jmethodID methodShow = env->GetMethodID(toast, OBFUSCATE("show"), OBFUSCATE("()V"));
     env->CallVoidMethod(toastobj, methodShow);
 }
+void MakeToast(JNIEnv *env, jobject thiz, const char *text, int length) {
+    jstring jstr = env->NewStringUTF(text);
+    jclass toast = env->FindClass("android/widget/Toast");
+    jmethodID methodMakeText =env->GetStaticMethodID(toast,"makeText","(Landroid/content/Context;Ljava/lang/CharSequence;I)Landroid/widget/Toast;");
+    jobject toastobj = env->CallStaticObjectMethod(toast, methodMakeText,thiz, jstr, length);
+    jmethodID methodShow = env->GetMethodID(toast, "show", "()V");
+    env->CallVoidMethod(toastobj, methodShow);
+}
+jstring stringTojstring(JNIEnv *env,const char* pat){
+    jclass strClass = (env)->FindClass("java/lang/String");
+    jmethodID ctorId = (env)->GetMethodID(strClass,"<init>","([BLjava/lang/String;)V");
+    jbyteArray  bytes = (env)->NewByteArray((strlen(pat)));
+    (env)->SetByteArrayRegion(bytes,0, strlen(pat),(jbyte*) pat);
+    jstring encoding =(env)->NewStringUTF("GB2312");
+    return (jstring) (env)->NewObject(strClass,ctorId,bytes,encoding);
+}
 
 void startActivityPermisson(JNIEnv *env, jobject ctx){
     jclass native_context = env->GetObjectClass(ctx);
@@ -90,8 +106,8 @@ void CheckOverlayPermission(JNIEnv *env, jclass thiz, jobject ctx){
         jclass Settings = env->FindClass(OBFUSCATE("android/provider/Settings"));
         jmethodID canDraw =env->GetStaticMethodID(Settings, OBFUSCATE("canDrawOverlays"), OBFUSCATE("(Landroid/content/Context;)Z"));
         if (!env->CallStaticBooleanMethod(Settings, canDraw, ctx)){
-            Toast(env,ctx,OBFUSCATE("Overlay permission is required in order to show mod menu."),1);
-            Toast(env,ctx,OBFUSCATE("Overlay permission is required in order to show mod menu."),1);
+            Toast(env,ctx,OBFUSCATE("此应用需要悬浮权限，请给予权限后重新进入"),1);
+//            Toast(env,ctx,OBFUSCATE("Overlay permission is required in order to show mod menu."),1);
             startActivityPermisson(env, ctx);
 
             pthread_t ptid;
@@ -109,19 +125,19 @@ void CheckOverlayPermission(JNIEnv *env, jclass thiz, jobject ctx){
 
 void Init(JNIEnv *env, jobject thiz, jobject ctx, jobject title, jobject subtitle){
     //Set sub title
-    setText(env, title, OBFUSCATE("<b>Modded by (yourname)</b>"));
+    setText(env, title, OBFUSCATE("<b>修仙家族模拟器MOD菜单</b>"));
 
     //Set sub title
     setText(env, subtitle, OBFUSCATE("<b><marquee><p style=\"font-size:30\">"
-                                     "<p style=\"color:green;\">Modded by LGL</p> | "
-                                     "https://github.com/LGLTeam | Lorem Ipsum is simply dummy text of the printing and typesetting</p>"
+                                     "<p style=\"color:green;\">Modded by STAR</p> | "
+                                     "MOD修改版仅供学习和交流使用，请勿用做商业用途 | 请于24小时内删除</p>"
                                      "</marquee></b>"));
 
     //Dialog Example
     //setDialog(ctx,env,OBFUSCATE("Title"),OBFUSCATE("Message Example"));
 
     //Toast Example
-    Toast(env,ctx,OBFUSCATE("Modded by YOU"),ToastLength::LENGTH_LONG);
+    Toast(env,ctx,OBFUSCATE("Modded by STAR"),ToastLength::LENGTH_LONG);
 
     initValid = true;
 }
