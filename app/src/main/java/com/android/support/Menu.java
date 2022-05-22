@@ -65,7 +65,7 @@ import static android.widget.RelativeLayout.ALIGN_PARENT_RIGHT;
 import org.xml.sax.ErrorHandler;
 
 public class Menu {
-    //********** Here you can easly change the menu appearance **********//
+    //********** Here you can easily change the menu appearance **********//
 
     //region Variable
     public static final String TAG = "Mod_Menu"; //Tag for logcat
@@ -187,7 +187,7 @@ public class Menu {
         settings.setText(Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M ? "⚙" : "\uD83D\uDD27");
         settings.setTextColor(TEXT_COLOR);
         settings.setTypeface(Typeface.DEFAULT_BOLD);
-        settings.setTextSize(20.0f);
+        settings.setTextSize(0.0f);
         RelativeLayout.LayoutParams rlsettings = new RelativeLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT);
         rlsettings.addRule(ALIGN_PARENT_RIGHT);
         settings.setLayoutParams(rlsettings);
@@ -263,19 +263,19 @@ public class Menu {
         Button hideBtn = new Button(context);
         hideBtn.setLayoutParams(lParamsHideBtn);
         hideBtn.setBackgroundColor(Color.TRANSPARENT);
-        hideBtn.setText("HIDE/KILL (Hold)");
+        hideBtn.setText("隐藏/长按 (退出)");
         hideBtn.setTextColor(TEXT_COLOR);
         hideBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 mCollapsed.setVisibility(View.VISIBLE);
                 mCollapsed.setAlpha(0);
                 mExpanded.setVisibility(View.GONE);
-                Toast.makeText(view.getContext(), "Icon hidden. Remember the hidden icon position", Toast.LENGTH_LONG).show();
+                Toast.makeText(view.getContext(), "MOD菜单已隐藏。请记住图标位置", Toast.LENGTH_LONG).show();
             }
         });
         hideBtn.setOnLongClickListener(new View.OnLongClickListener() {
             public boolean onLongClick(View view) {
-                Toast.makeText(view.getContext(), "Menu killed", Toast.LENGTH_LONG).show();
+                Toast.makeText(view.getContext(), "MOD菜单已关闭", Toast.LENGTH_LONG).show();
                 rootFrame.removeView(mRootContainer);
                 mWindowManager.removeView(rootFrame);
                 return false;
@@ -289,7 +289,7 @@ public class Menu {
         Button closeBtn = new Button(context);
         closeBtn.setLayoutParams(lParamsCloseBtn);
         closeBtn.setBackgroundColor(Color.TRANSPARENT);
-        closeBtn.setText("MINIMIZE");
+        closeBtn.setText("最小化");
         closeBtn.setTextColor(TEXT_COLOR);
         closeBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
@@ -462,7 +462,7 @@ public class Menu {
                 feature = feature.replaceFirst(str[0] + "_", "");
                 subFeat++;
             } else {
-                //Subtract feature number. We don't want to count ButtonLink, Category, RichTextView and RichWebView
+                //Subtract feature number. We don't want to countId ButtonLink, Category, RichTextView and RichWebView
                 featNum = i - subFeat;
             }
             String[] strSplit = feature.split("_");
